@@ -1,0 +1,85 @@
+#!/bin/bash
+
+# environment
+if [ -f /opt/fractal/calcdisp/bin/env ]; then
+  . /opt/fractal/calcdisp/bin/env
+else
+  echo "error: '/opt/fractal/calcdisp/bin/env' is missing"
+  exit 1
+fi
+
+cd ..
+
+prog_pid=$CALCDISP_LOG/calcdisp.pid
+prog_out=$CALCDISP_LOG/calcdisp.out
+prog="fractal.map.tests.transceiver.Server"
+
+do_start() {
+  nohup $CLIENT_JVM -Xmx64m $prog >$prog_out 2>&1 &
+  echo $! >$prog_pid
+  echo "Fractal map calculation dispatcher started. Check $prog_out for console messages."
+}
+
+do_stop() {
+  if [ ! "`pgrep -u vint rmiregistry`" = "" ]; then
+    java -client -classpath $CLASSPATH $prog stop
+    sleep 1
+    pkill -TERM -u vint rmiregistry
+  else
+    echo "Unable to stop Nokia VINT - rmiregistry is not running"
+  fi
+  if [ ! "`pgrep -u vint rmiregistry`" = "" ]; then
+    sleep 1
+    pkill -KILL -u vint rmiregistry
+  fi
+}
+
+do_stat() {
+  java -client -classpath $CLASSPATH $prog stat $*
+}
+
+do_kill() {
+  # kill VINT processes
+  if [ ! "`pgrep -u vint java`" = "" ]; then
+    echo "VINT. Going to kill VINT processes."
+    pkill -TERM -u vint java
+    sleep 1
+    pkill -KILL -u vint java
+  fi
+  # kill RMI
+  if [ ! "`pgrep -u vint rmiregistry`" = "" ]; then
+    echo "RMI. Going to kill rmiregistry."
+    pkill -KILL -u vint rmiregistry
+  fi  
+}
+
+
+# main
+case $1 in
+  start)
+    do_start
+    exit 0
+    ;;
+
+  stop)
+    do_stop
+    exit 0
+    ;;
+  
+  kill)
+    do_kill
+    exit 0
+    ;;
+
+  stat)
+    shift
+    do_stat $*
+    exit 0
+    ;;
+
+  *)
+    echo "usage: $0 { start | stop | kill | stat }"
+    exit 1
+    ;;
+esac
+exit 0

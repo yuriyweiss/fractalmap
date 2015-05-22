@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8" />
+<title>Main page</title>
+
+<link rel="stylesheet" href="css/main_page.css" type="text/css"
+	media="screen" />
+
+<script src="jslib/jquery-1.11.1.min.js" type="text/javascript"
+	charset="utf-8"></script>
+<script type="text/javascript" src="js/main_page.js"></script>
+<script type="text/javascript" src="js/frmp_init.js"></script>
+<script type="text/javascript" src="js/frmp_servlet_call.js"></script>
+<script type="text/javascript" src="js/frmp_paint_square.js"></script>
+</head>
+
+<body>
+	<table id="point_coords">
+		<tr>
+			<td class="coords_column1">Point RE:</td>
+			<td class="coords_column2"><input type="text" id="point_re" /></td>
+		</tr>
+		<tr>
+			<td class="coords_column1">Point IM:</td>
+			<td class="coords_column2"><input type="text" id="point_im" /></td>
+		</tr>
+	</table>
+	<div id="layer_index">Layer index:</div>
+	<canvas id="fractal_canvas" width="900" height="700"></canvas>
+	<div id="status_bar"></div>
+</body>
+
+</html>
