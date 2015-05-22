@@ -33,9 +33,9 @@ FRMP.getPrevLayerIndex = function() {
 };
 
 FRMP.hasNextLayer = function() {
-	if (FRMP.currentLayerIndex !== FRMP.getNextLayerIndex()) {
-		return true;
-	} else {
-		return false;
-	}
+	return FRMP.currentLayerIndex !== FRMP.getNextLayerIndex();
+};
+
+FRMP.hasPrevLayer = function() {
+	return FRMP.currentLayerIndex !== FRMP.getPrevLayerIndex();
 };

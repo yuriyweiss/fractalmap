@@ -1,15 +1,14 @@
 FRMP.initializeForm = function() {
 	$.getJSON('initialize-form', function(initParams) {
-		$('#point_re').val(initParams.centerRe.toString());
 		FRMP.centerRe = initParams.centerRe;
-		$('#point_im').val(initParams.centerIm.toString());
 		FRMP.centerIm = initParams.centerIm;
-		$('#layer_index').text('Layer index: ' + initParams.currentLayerIndex);
 		FRMP.currentLayerIndex = initParams.currentLayerIndex;
+		refreshPageInfo();
 		FRMP.squareSideSize = initParams.squareSideSize;
 		FRMP.layers = initParams.layers;
 		FRMP.showStatus('SUCCESS Form initialized');
 		FRMP.loadSquares();
+		// FRMP.fractalCanvas.addEventListener("mousedown", FRMP.mouseDownListener, false);
 	});
 };
 
@@ -26,10 +25,18 @@ FRMP.loadSquares = function() {
 			FRMP.showStatus('SUCCESS Area partition squares count: '
 					+ partitionResult.squares.length);
 			FRMP.squares = partitionResult.squares;
+			FRMP.clearCanvas();
 			FRMP.processingSquare = 0;
 			FRMP.loadNextSquare();
 		}
 	});
+};
+
+FRMP.clearCanvas = function() {
+	var canvas = FRMP.fractalCanvas;
+	var ctx = canvas.getContext('2d');
+	ctx.fillStyle = "rgb(255, 255, 255)";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
 };
 
 FRMP.loadNextSquare = function() {
@@ -92,17 +99,44 @@ FRMP.getPointCoords = function(canvasX, canvasY) {
 };
 
 FRMP.zoomInOneLayer = function(canvasX, canvasY) {
-	FRMP.getPointCoords(canvasX, canvasY);
-	if (!FRMP.hasNextLayer()) {
+	FRMP.zoomOneLayer(true, canvasX, canvasY);
+};
+
+FRMP.zoomOneLayer = function(zoomIn, canvasX, canvasY) {
+	var zoomOut = !zoomIn;
+	// return if no zoom possible
+	if ((zoomIn && !FRMP.hasNextLayer()) || (zoomOut && !FRMP.hasPrevLayer())) {
+		console.log('Zoom impossible. Side layer reached.');
 		return;
 	}
-	var data = {
-		layerIndex : FRMP.getNextLayerIndex(),
-		re : FRMP.mousePosRe,
-		im : FRMP.mousePosIm
+	// get zoom base point coords
+	var pointRe = FRMP.centerRe;
+	var pointIm = FRMP.centerIm;
+	if (canvasX && canvasY) {
+		FRMP.getPointCoords(canvasX, canvasY);
+		pointRe = FRMP.mousePosRe;
+		pointIm = FRMP.mousePosIm;
+	}
+	// get target layer index
+	var changedLayerIndex = FRMP.getNextLayerIndex();
+	if (zoomOut) {
+		changedLayerIndex = FRMP.getPrevLayerIndex();
 	}
 	// change layer, then load new squares
+	var data = {
+		layerIndex : changedLayerIndex,
+		re : pointRe,
+		im : pointIm
+	}
 	$.get('change-layer', data, function() {
 		FRMP.loadSquares();
+		FRMP.centerRe = pointRe;
+		FRMP.centerIm = pointIm;
+		FRMP.currentLayerIndex = changedLayerIndex;
+		refreshPageInfo();
 	});
+};
+
+FRMP.zoomOutOneLayer = function() {
+	FRMP.zoomOneLayer(false);
 };

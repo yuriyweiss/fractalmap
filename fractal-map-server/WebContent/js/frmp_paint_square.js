@@ -4,17 +4,17 @@ FRMP.paintSquare = function(squareResult) {
 		FRMP.showStatus('Paint square body');
 		FRMP.paintSquareIterationsDiffer(squareResult);
 	} else {
-		FRMP.showStatus('Paint square iterations: ' + sqaureResult.iterations);
+		FRMP.showStatus('Paint square iterations: ' + squareResult.iterations);
 		FRMP.paintSquareIterationsCommon(squareResult.iterations);
 	}
 };
 
 FRMP.paintSquareIterationsCommon = function(iterations) {
-	 var colorValue = FRMP.getColorValue(iterations);
-	 var canvas = $('#fractal_canvas');
-	 var ctx = canvas.getContext('2d');
-	 ctx.fillStyle = rgb(colorValue, colorValue, colorValue);
-	 ctx.fillRect(FRMP.currentSquare.canvasLeftX, FRMP.currentSquare.canvasTopY, FRMP.squareSideSize, FRMP.squareSideSize);
+	var canvas = FRMP.fractalCanvas;
+	var colorValue = FRMP.getColorValue(iterations);
+	var ctx = canvas.getContext('2d');
+	ctx.fillStyle = "rgb(" + colorValue + ", " + colorValue + ", " + colorValue + ")";
+	ctx.fillRect(FRMP.currentSquare.canvasLeftX, FRMP.currentSquare.canvasTopY, FRMP.squareSideSize, FRMP.squareSideSize);
 };
 
 FRMP.getColorValue = function(iterations) {
