@@ -2,17 +2,21 @@ FRMP.dragStartX = 0;
 FRMP.dragStartY = 0;
 FRMP.targetX = 0;
 FRMP.targetY = 0;
+FRMP.dragImageData = null;
 
 FRMP.mouseDownListener = function(evt) {
+	console.log('mouse down fired');
 	var rect = FRMP.fractalCanvas.getBoundingClientRect();
 	FRMP.dragStartX = evt.clientX - rect.left;
 	FRMP.dragStartY = evt.clientY - rect.top;
+	var canvas = FRMP.fractalCanvas;
+	
 	
 	window.addEventListener("mousemove", FRMP.mouseMoveListener, false);
 	FRMP.fractalCanvas.removeEventListener("mousedown", FRMP.mouseDownListener, false);
 	window.addEventListener("mouseup", FRMP.mouseUpListener, false);
 	
-	event.prevenDefault();
+	evt.preventDefault();
 	return false;
 };
 
@@ -29,22 +33,35 @@ FRMP.mouseMoveListener = function(evt) {
 	var maxY = FRMP.fractalCanvas.height;
 	
 	//clamp x and y positions to prevent object from dragging outside of canvas
-	posX = mouseX - dragHoldX;
+	posX = mouseX;
 	posX = (posX < minX) ? minX : ((posX > maxX) ? maxX : posX);
-	posY = mouseY - dragHoldY;
+	posY = mouseY;
 	posY = (posY < minY) ? minY : ((posY > maxY) ? maxY : posY);
 	
-	targetX = posX;
-	targetY = posY;
+	FRMP.targetX = posX;
+	FRMP.targetY = posY;
 	
-	// TODO redraw canvas
-	
-	// INFO copy and paste canvas region
-	// http://www.w3schools.com/tags/tryit.asp?filename=tryhtml5_canvas_getimagedata
+	var shiftX = FRMP.targetX - FRMP.dragStartX;
+	var shiftY = FRMP.targetY - FRMP.dragStartY;
+	var canvas = FRMP.fractalCanvas;
+	var ctx = canvas.getContext('2d');
+	if (FRMP.dragImageData === null && (Math.abs(shiftX) > 10 || Math.abs(shiftY) > 10)) {
+		FRMP.dragImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+	}
+	if (FRMP.dragImageData !== null) {
+		FRMP.clearCanvas();
+		ctx.putImageData(FRMP.dragImageData, shiftX, shiftY);
+	}
 };
 
 FRMP.mouseUpListener = function(evt) {
-	FRMP.fractalCanvas.addEventListener("mousedown", FRMP.mouseDownListener, false);
 	window.removeEventListener("mouseup", FRMP.mouseUpListener, false);
 	window.removeEventListener("mousemove", FRMP.mouseMoveListener, false);
+	FRMP.dragImageData = null;
+	var shiftX = FRMP.targetX - FRMP.dragStartX;
+	var shiftY = FRMP.targetY - FRMP.dragStartY;
+	if (Math.abs(shiftX) > 10 || Math.abs(shiftY) > 10) {
+		FRMP.moveViewport(shiftX, shiftY);
+	}
+	FRMP.fractalCanvas.addEventListener("mousedown", FRMP.mouseDownListener, false);
 };

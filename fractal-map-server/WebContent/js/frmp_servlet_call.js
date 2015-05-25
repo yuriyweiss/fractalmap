@@ -8,14 +8,28 @@ FRMP.initializeForm = function() {
 		FRMP.layers = initParams.layers;
 		FRMP.showStatus('SUCCESS Form initialized');
 		FRMP.loadSquares();
-		// FRMP.fractalCanvas.addEventListener("mousedown", FRMP.mouseDownListener, false);
+	});
+};
+
+FRMP.returnToInitialState = function() {
+	FRMP.centerRe = -0.5;
+	FRMP.centerIm = 0;
+	FRMP.currentLayerIndex = 1;
+	data = {
+		layerIndex : FRMP.currentLayerIndex,
+		re : FRMP.centerRe,
+		im : FRMP.centerIm
+	};
+	$.get('change-viewport-params', data, function() {
+		FRMP.loadSquares();
+		refreshPageInfo();
 	});
 };
 
 FRMP.loadSquares = function() {
 	var data = {
-		areaWidth : FRMP.fractalCanvas.width,
-		areaHeight : FRMP.fractalCanvas.height
+		areaWidth : FRMP.fractalCanvas[0].width,
+		areaHeight : FRMP.fractalCanvas[0].height
 	};
 	$.getJSON('squares-partition', data, function(partitionResult) {
 		if (partitionResult.wasError) {
@@ -25,18 +39,12 @@ FRMP.loadSquares = function() {
 			FRMP.showStatus('SUCCESS Area partition squares count: '
 					+ partitionResult.squares.length);
 			FRMP.squares = partitionResult.squares;
-			FRMP.clearCanvas();
+			FRMP.fractalCanvas.removeLayerGroup('squares');
+			FRMP.fractalCanvas.clearCanvas();
 			FRMP.processingSquare = 0;
 			FRMP.loadNextSquare();
 		}
 	});
-};
-
-FRMP.clearCanvas = function() {
-	var canvas = FRMP.fractalCanvas;
-	var ctx = canvas.getContext('2d');
-	ctx.fillStyle = "rgb(255, 255, 255)";
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
 };
 
 FRMP.loadNextSquare = function() {
@@ -78,8 +86,8 @@ FRMP.loadNextSquare = function() {
 
 FRMP.getPointCoords = function(canvasX, canvasY) {
 	// get canvas center coords
-	var canvasCenterX = Math.round(FRMP.fractalCanvas.width / 2);
-	var canvasCenterY = Math.round(FRMP.fractalCanvas.height / 2);
+	var canvasCenterX = Math.round(FRMP.fractalCanvas[0].width / 2);
+	var canvasCenterY = Math.round(FRMP.fractalCanvas[0].height / 2);
 	// calculate shiftX, shiftY relative to the center
 	var calcShiftX = canvasX - canvasCenterX;
 	// y coord shift is inverted
@@ -128,7 +136,7 @@ FRMP.zoomOneLayer = function(zoomIn, canvasX, canvasY) {
 		re : pointRe,
 		im : pointIm
 	}
-	$.get('change-layer', data, function() {
+	$.get('change-viewport-params', data, function() {
 		FRMP.loadSquares();
 		FRMP.centerRe = pointRe;
 		FRMP.centerIm = pointIm;
@@ -139,4 +147,28 @@ FRMP.zoomOneLayer = function(zoomIn, canvasX, canvasY) {
 
 FRMP.zoomOutOneLayer = function() {
 	FRMP.zoomOneLayer(false);
+};
+
+FRMP.moveViewport = function(shiftX, shiftY) {
+	var data = {
+		shiftX : shiftX,
+		shiftY : shiftY
+	};
+	$.getJSON('get-point-coords', data, function(coordsResult) {
+		if (!coordsResult.wasError) {
+			$('#point_re').val(coordsResult.re.toString());
+			FRMP.centerRe = coordsResult.re;
+			$('#point_im').val(coordsResult.im.toString());
+			FRMP.centerIm = coordsResult.im;
+		}
+	});
+	data = {
+		layerIndex : FRMP.currentLayerIndex,
+		re : FRMP.centerRe,
+		im : FRMP.centerIm
+	};
+	$.get('change-viewport-params', data, function() {
+		FRMP.loadSquares();
+		refreshPageInfo();
+	});
 };

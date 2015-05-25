@@ -30,6 +30,16 @@ html,body {
 	z-order: 100;
 }
 
+#main_toolbar {
+	position: absolute;
+	right: 40px;
+	top: 150px;
+	width: 100px;
+	height: 200px; 
+	border: 1px solid red;
+	z-order: 100;
+}
+
 #point_coords td.coords_column1 {
 	width: 25%
 }

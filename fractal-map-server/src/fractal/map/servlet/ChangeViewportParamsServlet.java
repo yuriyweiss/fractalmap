@@ -9,11 +9,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-@WebServlet(name = "change-layer", urlPatterns = { "/change-layer" })
-public class ChangeLayerServlet extends HttpServlet {
+@WebServlet(name = "change-viewport-params", urlPatterns = { "/change-viewport-params" })
+public class ChangeViewportParamsServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
-    public ChangeLayerServlet() {
+    public ChangeViewportParamsServlet() {
         super();
     }
 

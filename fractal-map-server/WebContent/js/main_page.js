@@ -1,14 +1,19 @@
 $(document).ready(function() {
 	FRMP.showStatus('Page loaded');
+	
+	$('#home_button').button().click(FRMP.returnToInitialState);
+	
 	var canvas = $('#fractal_canvas')[0];
-	FRMP.fractalCanvas = canvas;
 	canvas.width = window.innerWidth - 60;
 	canvas.height = window.innerHeight - 60;
+	FRMP.fractalCanvas = $('#fractal_canvas');
 	FRMP.initializeForm();
 	
-	$(canvas).on('click', onCanvasClick);
-	$(canvas).on('dblclick', onCanvasDblClick);
-	$(canvas).mousewheel(onCanvasMouseWheel);
+	FRMP.fractalCanvas.on('click', onCanvasClick);
+	FRMP.fractalCanvas.on('dblclick', onCanvasDblClick);
+	// $(canvas).mousewheel(onCanvasMouseWheel);
+	// not jQuery drag realization
+	// canvas.addEventListener('mousedown', FRMP.mouseDownListener, false);
 });
 
 function refreshPageInfo() {
@@ -25,7 +30,7 @@ function onCanvasClick(evt) {
 }
 
 function getClickCoordsInCanvas(evt) {
-	var rect = FRMP.fractalCanvas.getBoundingClientRect();
+	var rect = FRMP.fractalCanvas[0].getBoundingClientRect();
 	var result = {
 		canvasX : evt.clientX - rect.left,
 		canvasY : evt.clientY - rect.top

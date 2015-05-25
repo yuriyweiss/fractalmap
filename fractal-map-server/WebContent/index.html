@@ -5,14 +5,19 @@
 <meta charset="UTF-8" />
 <title>Main page</title>
 
+<link rel="stylesheet" href="jslib/jquery-ui/jquery-ui.min.css" type="text/css"	media="screen" />
 <link rel="stylesheet" href="css/main_page.css" type="text/css"	media="screen" />
 
 <script type="text/javascript" src="jslib/jquery-1.11.1.min.js" charset="utf-8"></script>
+<script type="text/javascript" src="jslib/jquery-ui/jquery-ui.min.js" charset="utf-8"></script>
 <script type="text/javascript" src="jslib/jquery.mousewheel.min.js"></script>
+<script type="text/javascript" src="jslib/jcanvas.min.js"></script>
+
 <script type="text/javascript" src="js/main_page.js"></script>
 <script type="text/javascript" src="js/frmp_init.js"></script>
 <script type="text/javascript" src="js/frmp_servlet_call.js"></script>
 <script type="text/javascript" src="js/frmp_paint_square.js"></script>
+<script type="text/javascript" src="js/frmp_canvas_drag.js"></script>
 </head>
 
 <body>
@@ -27,6 +32,9 @@
 		</tr>
 	</table>
 	<div id="layer_index" style="background-color: white">Layer index:</div>
+	<div id="main_toolbar">
+		<button id="home_button">Home</button>
+	</div>
 	<canvas id="fractal_canvas" width="900" height="700"></canvas>
 	<div id="status_bar"></div>
 </body>
